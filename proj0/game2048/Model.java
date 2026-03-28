@@ -113,6 +113,89 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        if (side == Side.NORTH) {
+            for (int c = 0; c < board.size(); c++) {
+                int[] mergeSign = new int[board.size()];
+                for (int i = 0; i < board.size(); i++) {
+                    mergeSign[i] = 0;
+                }
+                for (int r = board.size() - 2; r >= 0; r--) { // select column element from up to down (c, r)
+                    int c_r_index = r;
+
+                    if (board.tile(c, r) == null) {
+                        continue;
+                    }
+
+                    Tile t = board.tile(c, r);
+                    int value = t.value();
+
+                    for (int j = r; j < board.size() - 1 ; j++) { // find the final position along the upper direction (c, j)
+                        Tile next = board.tile(c, j + 1);
+                        if (next != null && (next.value() != value || mergeSign[j + 1] != 0) ) {
+                            break;
+                        } else {
+                            c_r_index = j + 1;
+                        }
+
+                        }
+
+                    if (c_r_index > r ){
+                        changed = true;
+                        boolean changeSign = board.move(c, c_r_index, t);
+                        if (changeSign) {
+                            mergeSign[c_r_index] = 1;
+                            score += board.tile(c, c_r_index).value();
+                        }
+                    }
+
+
+                }
+
+                }
+            } else {
+            board.setViewingPerspective(side);
+            for (int c = 0; c < board.size(); c++) {
+                int[] mergeSign = new int[board.size()];
+                for (int i = 0; i < board.size(); i++) {
+                    mergeSign[i] = 0;
+                }
+                for (int r = board.size() - 2; r >= 0; r--) { // select column element from up to down (c, r)
+                    int c_r_index = r;
+
+                    if (board.tile(c, r) == null) {
+                        continue;
+                    }
+
+                    Tile t = board.tile(c, r);
+                    int value = t.value();
+
+                    for (int j = r; j < board.size() - 1 ; j++) { // find the final position along the upper direction (c, j)
+                        Tile next = board.tile(c, j + 1);
+                        if (next != null && (next.value() != value || mergeSign[j + 1] != 0) ) {
+                            break;
+                        } else {
+                            c_r_index = j + 1;
+                        }
+
+                    }
+
+                    if (c_r_index > r ){
+                        changed = true;
+                        boolean changeSign = board.move(c, c_r_index, t);
+                        if (changeSign) {
+                            mergeSign[c_r_index] = 1;
+                            score += board.tile(c, c_r_index).value();
+                        }
+                    }
+
+
+                }
+
+            }
+            board.setViewingPerspective(Side.NORTH);
+
+        }
+
 
         checkGameOver();
         if (changed) {
@@ -138,6 +221,15 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+
+        for (int i = 0; i < b.size(); i++){
+            for (int j = 0; j < b.size(); j++){
+                if (b.tile(i, j) == null){
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -148,6 +240,14 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+
+        for (int i = 0; i < b.size(); i++){
+            for (int j = 0; j < b.size(); j++){
+                if (b.tile(i, j) != null && b.tile(i, j).value() == MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +259,90 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i++) {
+            for (int j = 0; j < b.size(); j++) {
+
+                if (b.tile(i, j) == null) {
+                    return true;
+                }
+
+                if (i == 0 && j == 0) { // bottom left corner
+                    if (b.tile(i, j + 1) != null && b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+                        return true;  // up
+                    } else if (b.tile(i + 1, j) != null && b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+                        return true;  // right
+                    }
+
+                } else if (i > 0 && i < b.size() - 1 && j == 0) { // bottom middle
+                    if (b.tile(i, j + 1) != null && b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+                        return true;  // up
+                    } else if (b.tile(i + 1, j) != null && b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+                        return true;  // right
+                    } else if (b.tile(i - 1, j) != null && b.tile(i, j).value() == b.tile(i - 1, j).value()) {
+                        return true;  // left
+                    }
+
+                } else if (i == b.size() - 1 && j == 0) { // bottom right corner
+                    if (b.tile(i, j + 1) != null && b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+                        return true;  // up
+                    } else if (b.tile(i - 1, j) != null && b.tile(i, j).value() == b.tile(i - 1, j).value()) {
+                        return true;  // left
+                    }
+
+                } else if (i == 0 && j > 0 && j < b.size() - 1) { // left side middle
+                    if (b.tile(i, j + 1) != null && b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+                        return true;  // up
+                    } else if (b.tile(i, j - 1) != null && b.tile(i, j).value() == b.tile(i, j - 1).value()) {
+                        return true;  // down
+                    } else if (b.tile(i + 1, j) != null && b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+                        return true;  // right
+                    }
+
+                } else if (i == 0 && j == b.size() - 1) { // top left corner
+                    if (b.tile(i, j - 1) != null && b.tile(i, j).value() == b.tile(i, j - 1).value()) {
+                        return true;  // down
+                    } else if (b.tile(i + 1, j) != null && b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+                        return true;  // right
+                    }
+
+                } else if (i > 0 && i < b.size() - 1 && j == b.size() - 1) { // top middle
+                    if (b.tile(i, j - 1) != null && b.tile(i, j).value() == b.tile(i, j - 1).value()) {
+                        return true;  // down
+                    } else if (b.tile(i + 1, j) != null && b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+                        return true;  // right
+                    } else if (b.tile(i - 1, j) != null && b.tile(i, j).value() == b.tile(i - 1, j).value()) {
+                        return true;  // left
+                    }
+
+                } else if (i == b.size() - 1 && j == b.size() - 1) { // top right corner
+                    if (b.tile(i, j - 1) != null && b.tile(i, j).value() == b.tile(i, j - 1).value()) {
+                        return true;  // down
+                    } else if (b.tile(i - 1, j) != null && b.tile(i, j).value() == b.tile(i - 1, j).value()) {
+                        return true;  // left
+                    }
+
+                } else if (i == b.size() - 1 && j > 0 && j < b.size() - 1) { // right side middle
+                    if (b.tile(i, j + 1) != null && b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+                        return true;  // up
+                    } else if (b.tile(i, j - 1) != null && b.tile(i, j).value() == b.tile(i, j - 1).value()) {
+                        return true;  // down
+                    } else if (b.tile(i - 1, j) != null && b.tile(i, j).value() == b.tile(i - 1, j).value()) {
+                        return true;  // left
+                    }
+
+                } else { // inner part
+                    if (b.tile(i, j + 1) != null && b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+                        return true;  // up
+                    } else if (b.tile(i, j - 1) != null && b.tile(i, j).value() == b.tile(i, j - 1).value()) {
+                        return true;  // down
+                    } else if (b.tile(i + 1, j) != null && b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+                        return true;  // right
+                    } else if (b.tile(i - 1, j) != null && b.tile(i, j).value() == b.tile(i - 1, j).value()) {
+                        return true;  // left
+                    }
+                }
+            }
+        }
         return false;
     }
 
