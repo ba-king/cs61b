@@ -1,8 +1,10 @@
 package deque;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private int size;
     private int nextFirst;
@@ -22,7 +24,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
 
         int oldFirst = (nextFirst + 1) % items.length;
 
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             int oldIndex = (oldFirst + i) % items.length;
             a[i] = items[oldIndex];
         }
@@ -34,7 +36,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     }
 
     @Override
-    public void addFirst(T item){
+    public void addFirst(T item) {
         if (size == items.length) {
             resize(size * 2);
         }
@@ -50,7 +52,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     }
 
     @Override
-    public void addLast(T item){
+    public void addLast(T item) {
         if (size == items.length) {
             /* 可以按照要求来 */
             resize(size * 2);
@@ -75,12 +77,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
 //    }
 
     @Override
-    public int size(){
+    public int size() {
         return size;
     }
 
     @Override
-    public void printDeque(){
+    public void printDeque() {
         int index = (nextFirst + 1) % items.length;
 
         for (int i = 0; i < size; i++) {
@@ -92,7 +94,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     }
 
     @Override
-    public T removeFirst(){
+    public T removeFirst() {
         if (size == 0) {
             return null;
         }
@@ -120,7 +122,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     }
 
     @Override
-    public T removeLast(){
+    public T removeLast() {
         if (size == 0) {
             return null;
         }
@@ -148,7 +150,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     }
 
     @Override
-    public T get(int index){
+    public T get(int index) {
         if (index < 0 || index >= size) {
             return null;
         }
@@ -158,14 +160,14 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>  {
     }
 
     @Override
-    public Iterator<T> iterator(){
+    public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
 
     private class ArrayDequeIterator implements Iterator<T> {
         private int position;
 
-        public ArrayDequeIterator(){
+        private ArrayDequeIterator() {
             position = 0;
         }
 
